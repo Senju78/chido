@@ -17,15 +17,10 @@ const NoteCard = ({ note, onUpdateNote, onDeleteNote }: NoteCardProps) => {
 
     const cardRef = useRef<HTMLDivElement | null>(null);
 
-    function toggleExpand() {
-        setIsExpanded(!isExpanded);
-    }
+    const toggleExpand = () => setIsExpanded(!isExpanded);
+    const handleEditClick = () => setIsEditing(!isEditing);
 
-    function handleEditClick() {
-        setIsEditing(!isEditing);
-    }
-
-    function handleSaveClick() {
+    const handleSaveClick = () => {
         setIsEditing(false);
         onUpdateNote({
             ...note,
@@ -33,95 +28,98 @@ const NoteCard = ({ note, onUpdateNote, onDeleteNote }: NoteCardProps) => {
             content: editContent,
             category: editCategory,
         });
-    }
+    };
 
     useEffect(() => {
         if (isExpanded && cardRef.current) {
-            cardRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-            });
+            cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
         }
     }, [isExpanded]);
 
     return (
         <div
-            {...(isEditing ? {} : { onClick: toggleExpand })}
             ref={cardRef}
-            className={`p-4 bg-white text-black rounded-lg shadow-md mb-4 min-h-60 space-y-2 ${
-                isExpanded || note.isCreating ? "max-w-full min-w-96 min-h-72" : "max-w-72 min-w-72"
-            } transition-all ease-in-out duration-300`}
+            className={`relative p-6 rounded-xl shadow-glow transition-transform transform ${
+                isExpanded ? "scale-105" : "scale-100"
+            } bg-lightPurple hover:shadow-2xl hover:scale-105 mb-6`}
         >
-            <div className="flex flex-row items-center space-x-2">
-                <div
-                    className={`${
-                        note.category === 1
-                            ? "bg-red-500"
-                            : note.category === 2
-                            ? "bg-red-700"
-                            : "bg-red-900"
-                    } rounded-full p-[6px]`}
-                ></div>
-                {isEditing || note.isCreating ? (
+            <div className="flex justify-between items-center mb-4">
+                {isEditing ? (
                     <input
                         type="text"
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
+                        className="w-full p-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkPurple"
                         placeholder="Título de la nota"
-                        className="text-xl font-semibold text-black truncate w-full p-2 border rounded-md focus:outline-none"
                     />
                 ) : (
-                    <h2 className="text-xl font-semibold text-black truncate">{note.title}</h2>
+                    <h2
+                        onClick={toggleExpand}
+                        className="text-lg font-bold truncate text-darkPurple cursor-pointer hover:underline"
+                    >
+                        {note.title}
+                    </h2>
                 )}
+                <div
+                    className={`w-4 h-4 rounded-full ${
+                        note.category === 1
+                            ? "bg-vividPink"
+                            : note.category === 2
+                            ? "bg-pastelBlue"
+                            : "bg-pastelGreen"
+                    }`}
+                ></div>
             </div>
-            <div className="max-h-60 min-h-40 text-ellipsis">
-                {isEditing || note.isCreating ? (
+
+            <div className="text-sm text-gray-700 mb-4">
+                {isEditing ? (
                     <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
-                        className="w-full p-2 border rounded-md resize-none bg-white text-black focus:outline-none"
+                        className="w-full p-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkPurple resize-none"
                         rows={4}
                         placeholder="Escribe tu nota aquí..."
                     />
                 ) : (
-                    <p className="text-black line-clamp-[6] text-justify">{note.content}</p>
+                    <p
+                        onClick={toggleExpand}
+                        className={`cursor-pointer ${isExpanded ? "line-clamp-none" : "line-clamp-3"}`}
+                    >
+                        {note.content}
+                    </p>
                 )}
             </div>
-            {isEditing || note.isCreating ? (
-                <div className="w-full flex flex-col space-y-2">
-                    <select
-                        value={editCategory}
-                        onChange={(e) => setEditCategory(Number(e.target.value))}
-                        className="w-full p-2 border rounded-md bg-white text-black focus:outline-none"
-                    >
-                        <option value={1}>Ideas</option>
-                        <option value={2}>Por hacer</option>
-                        <option value={3}>Terminado</option>
-                    </select>
-                </div>
-            ) : (
-                ""
+
+            {isEditing && (
+                <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(Number(e.target.value))}
+                    className="w-full mb-4 p-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkPurple"
+                >
+                    <option value={1}>Ideas</option>
+                    <option value={2}>Por hacer</option>
+                    <option value={3}>Terminado</option>
+                </select>
             )}
-            <div className="w-full flex justify-end items-center space-x-2">
+
+            <div className="flex justify-between">
                 <button
                     onClick={() => onDeleteNote(note.id)}
-                    className={`border border-red-500 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-md transition-all ease-in-out duration-300 ${
-                        isEditing || note.isCreating ? "hidden" : ""
-                    }`}
+                    className="text-white bg-vividPink px-4 py-2 rounded-lg shadow-md hover:bg-darkPurple transition-all"
                 >
                     Eliminar
                 </button>
-                {isEditing || note.isCreating ? (
-                    <div className="flex flex-row space-x-4">
+                {isEditing ? (
+                    <div className="flex space-x-2">
                         <button
-                            onClick={handleSaveClick}
-                            className="text-black border border-black hover:bg-black hover:text-white p-2 rounded-md transition-all ease-in-out duration-300"
+                            onClick={() => setIsEditing(false)}
+                            className="text-darkPurple border border-darkPurple px-4 py-2 rounded-lg hover:bg-darkPurple hover:text-white transition-all"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={handleSaveClick}
-                            className="text-white bg-red-500 hover:bg-red-700 p-2 rounded-md transition-all ease-in-out duration-300"
+                            className="text-white bg-darkPurple px-4 py-2 rounded-lg shadow-md hover:bg-vividPink transition-all"
                         >
                             Guardar
                         </button>
@@ -129,12 +127,18 @@ const NoteCard = ({ note, onUpdateNote, onDeleteNote }: NoteCardProps) => {
                 ) : (
                     <button
                         onClick={handleEditClick}
-                        className="text-white bg-red-700 hover:bg-red-900 p-2 rounded-md transition-all ease-in-out duration-300"
+                        className="text-white bg-darkPurple px-4 py-2 rounded-lg shadow-md hover:bg-vividPink transition-all"
                     >
                         Editar
                     </button>
                 )}
             </div>
+
+            {isExpanded && !isEditing && (
+                <div className="absolute top-2 right-2 text-xs text-gray-500">
+                    Última modificación: {new Date(note.created_at).toLocaleDateString()}
+                </div>
+            )}
         </div>
     );
 };

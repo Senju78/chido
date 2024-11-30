@@ -9,10 +9,10 @@ interface NoteListProps {
 
 const NoteList = ({ notes, onUpdateNote, onDeleteNote }: NoteListProps) => {
     return (
-        <div className="flex flex-wrap p-6 gap-6 bg-pastelCream text-pastelPurple max-h-screen overflow-auto rounded-lg shadow-md transition-all ease-in-out duration-300">
+        <div className="flex flex-wrap p-6 gap-8 bg-gradient-to-br from-lightPurple to-darkPurple text-white max-h-screen overflow-auto rounded-2xl shadow-glow transition-all duration-300">
             {notes.length === 0 ? (
-                <p className="text-xl font-semibold text-pastelBlue animate-pulse">
-                    No hay notas disponibles...
+                <p className="text-xl font-semibold text-vividPink animate-pulse">
+                    ¡No hay notas aún! Comienza creando una nueva 🎉
                 </p>
             ) : (
                 notes.map((note) => (

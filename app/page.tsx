@@ -10,6 +10,7 @@ export default function Home() {
     const [notes, setNotes] = useState<NoteData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filterId, setFilterId] = useState<number>(0);
+    const [sortByDate, setSortByDate] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchNotes = async () => {
@@ -17,7 +18,7 @@ export default function Home() {
             let query = supabase
                 .from("notes")
                 .select("*")
-                .order("created_at", { ascending: false });
+                .order("created_at", { ascending: !sortByDate });
 
             if (filterId !== 0) {
                 query = query.eq("category", filterId);
@@ -39,7 +40,7 @@ export default function Home() {
         };
 
         fetchNotes();
-    }, [filterId]);
+    }, [filterId, sortByDate]);
 
     const handleAddNote = async () => {
         const newNote = {
@@ -100,24 +101,30 @@ export default function Home() {
     };
 
     return (
-        <div className="flex flex-row h-screen bg-gradient-to-t from-indigo-200 via-pink-200 to-yellow-200">
+        <div className="flex flex-row h-screen bg-purple-200">
             <div className="max-w-60 border-r shadow-md bg-gradient-to-b from-indigo-500 to-pink-500 text-white">
                 <Sidebar onFilterChange={setFilterId} />
             </div>
-            <div className="flex flex-col w-full bg-pastelCream text-pastelGray p-6">
-                <div className="p-4 flex justify-between items-center">
+            <div className="flex flex-col w-full bg-purple-100 text-pastelGray p-6">
+                <div className="p-4 flex flex-col items-start space-y-4">
                     <button
                         onClick={handleAddNote}
-                        className="px-6 py-3 bg-pastelGreen text-white rounded-xl hover:bg-pastelBlue transition-all"
+                        className="px-8 py-4 bg-purple-700 text-white font-semibold rounded-full shadow-lg hover:bg-purple-500 transition-transform transform hover:scale-105"
                     >
-                        Agregar Nota
+                        + Nueva Nota
+                    </button>
+                    <button
+                        onClick={() => setSortByDate(!sortByDate)}
+                        className="px-6 py-3 bg-purple-500 text-white font-medium rounded-lg hover:bg-purple-300 transition-all"
+                    >
+                        Ordenar por Fecha: {sortByDate ? "Descendente" : "Ascendente"}
                     </button>
                 </div>
                 <div className="flex-1 p-4" onDoubleClick={handleAddNote}>
                     {isLoading ? (
                         <SkeletonLoader />
                     ) : notes.length === 0 ? (
-                        <p className="text-xl font-semibold text-pastelBlue animate-pulse">
+                        <p className="text-xl font-semibold text-purple-700 animate-pulse">
                             No hay notas con esta categoría...
                         </p>
                     ) : (
